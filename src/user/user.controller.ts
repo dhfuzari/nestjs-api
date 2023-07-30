@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Patch,
   Post,
   Put,
@@ -48,9 +49,9 @@ export class UserController {
   }
 
   @Delete(':id')
-  async delete(@Param() param) {
+  async delete(@Param('id', ParseIntPipe) id: number) {
     return {
-      ...param,
+      id,
     };
   }
 }
