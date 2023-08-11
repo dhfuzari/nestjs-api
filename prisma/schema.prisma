@@ -8,10 +8,11 @@ datasource db {
 }
 
 model users {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(63)
-  email     String   @db.VarChar(127)
-  password  String   @db.VarChar(127)
-  createdAt DateTime @default(now()) @db.Timestamp(0)
-  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(63)
+  email     String    @db.VarChar(127)
+  password  String    @db.VarChar(127)
+  birthdate DateTime? @db.Date
+  createdAt DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt DateTime  @default(now()) @db.Timestamp(0)
 }
