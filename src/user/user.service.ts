@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDTO } from './dto/create.user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdateTotalUserDTO } from './dto/update-total.user.dto';
@@ -6,25 +6,47 @@ import { UpdatePartialUserDTO } from './dto/update-partial.user.dto';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async userExists(id) {
+    if (!(await this.readById(id))) {
+      throw new NotFoundException(`User ${id} does not exists`);
+    }
+  }
 
   async create(data: CreateUserDTO) {
-    return await this.prisma.users.create({ data });
+    return await this.prismaService.users.create({ data });
   }
 
   async read() {
-    return await this.prisma.users.findMany();
+    return await this.prismaService.users.findMany();
   }
 
   async readById(id: number) {
-    return await this.prisma.users.findUnique({ where: { id } });
+    return await this.prismaService.users.findUnique({ where: { id } });
   }
 
   async updateTotal(id: number, data: UpdateTotalUserDTO) {
-    return this.prisma.users.update({ where: { id }, data: { ...data } });
+    await this.userExists(id);
+
+    return this.prismaService.users.update({
+      where: { id },
+      data: { ...data },
+    });
   }
 
   async updatePartial(id: number, data: UpdatePartialUserDTO) {
-    return this.prisma.users.update({ where: { id }, data: { ...data } });
+    await this.userExists(id);
+
+    return this.prismaService.users.update({
+      where: { id },
+      data: { ...data },
+    });
+  }
+
+  async delete(id: number) {
+    await this.userExists(id);
+
+    return this.prismaService.users.delete({ where: { id } });
   }
 }
