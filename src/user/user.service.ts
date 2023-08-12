@@ -8,14 +8,8 @@ import { UpdatePartialUserDTO } from './dto/update-partial.user.dto';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({ email, name, password }: CreateUserDTO) {
-    return await this.prisma.users.create({
-      data: {
-        email,
-        name,
-        password,
-      },
-    });
+  async create(data: CreateUserDTO) {
+    return await this.prisma.users.create({ data });
   }
 
   async read() {
