@@ -17,6 +17,7 @@ import { Roles } from 'src/decorators/role.decorator';
 import { Role } from 'src/enums/role.enum';
 import { RoleGuard } from 'src/guards/role.guard';
 import { AuthGuard } from 'src/guards/auth.guard';
+import { Throttle } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
@@ -29,12 +30,14 @@ export class UserController {
     return await this.userService.create(body);
   }
 
+  @Throttle(100, 60)
   @Roles(Role.Admin, Role.User)
   @Get()
   async read() {
     return await this.userService.read();
   }
 
+  @Throttle(100, 60)
   @Get(':id')
   async readOne(@ParamIdDecorator() id: number) {
     return await this.userService.readById(id);
