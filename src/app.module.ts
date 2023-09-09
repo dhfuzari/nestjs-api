@@ -10,6 +10,7 @@ import { FileModule } from './file/file.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { PugAdapter } from '@nestjs-modules/mailer/dist/adapters/pug.adapter';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UserEntity } from './user/entity/user.entity';
 
 @Module({
   imports: [
@@ -48,7 +49,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       username: process.env.TYPEORM_DB_USERNAME,
       password: process.env.TYPEORM_DB_PASSWORD,
       database: process.env.TYPEORM_DB_DATABASE,
-      entities: [],
+      entities: [UserEntity],
       synchronize: process.env.ENV === 'development',
     }),
   ],
