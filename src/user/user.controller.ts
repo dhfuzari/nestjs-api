@@ -12,13 +12,13 @@ import { CreateUserDTO } from './dto/create.user.dto';
 import { UpdateTotalUserDTO } from './dto/update-total.user.dto';
 import { UpdatePartialUserDTO } from './dto/update-partial.user.dto';
 import { UserService } from './user.service';
-import { ParamIdDecorator } from 'src/decorators/param-id.decorator';
-import { Roles } from 'src/decorators/role.decorator';
 
-import { RoleGuard } from 'src/guards/role.guard';
-import { AuthGuard } from 'src/guards/auth.guard';
 import { Throttle } from '@nestjs/throttler';
 import { Role } from '../enums/role.enum';
+import { AuthGuard } from '../guards/auth.guard';
+import { RoleGuard } from '../guards/role.guard';
+import { Roles } from '../decorators/role.decorator';
+import { ParamIdDecorator } from '../decorators/param-id.decorator';
 
 @UseGuards(AuthGuard, RoleGuard)
 @Controller('users')
