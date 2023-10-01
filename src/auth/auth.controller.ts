@@ -21,7 +21,6 @@ import {
   FileInterceptor,
   FileFieldsInterceptor,
 } from '@nestjs/platform-express';
-import { join } from 'path';
 
 import { AuthGuard } from '../guards/auth.guard';
 import { UserDecorator } from '../decorators/user.decorator';
@@ -76,16 +75,9 @@ export class AuthController {
     photo: Express.Multer.File,
   ) {
     try {
-      const path = join(
-        __dirname,
-        '..',
-        '..',
-        'storage',
-        'photos',
-        `photo-${user.id}.png`,
-      );
+      const fileName = `photo-${user.id}.png`;
 
-      await this.fileService.upload(photo, path);
+      await this.fileService.upload(photo, fileName);
     } catch (e) {
       throw new BadRequestException(e);
     }
@@ -108,13 +100,14 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('files-fields')
   async uploadFilesFields(
-    @UserDecorator() user,
     @UploadedFiles()
-    files: { photo: Express.Multer.File; documents: Express.Multer.File },
+    files: {
+      photo: Express.Multer.File;
+      documents: Express.Multer.File;
+    },
   ) {
     try {
-      const path = join(__dirname, '..', '..', 'storage', 'files');
-      await this.fileService.uploadFiles(files, path);
+      await this.fileService.uploadFiles(files);
       return { success: true };
     } catch (e) {
       throw new BadRequestException(e);
