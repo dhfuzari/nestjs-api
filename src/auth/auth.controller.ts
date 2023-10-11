@@ -25,6 +25,7 @@ import {
 import { AuthGuard } from '../guards/auth.guard';
 import { UserDecorator } from '../decorators/user.decorator';
 import { FileService } from '../file/file.service';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -55,15 +56,15 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('me')
-  async me(@UserDecorator() user) {
-    return { user };
+  async me(@UserDecorator() user: UserEntity) {
+    return user;
   }
 
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(AuthGuard)
   @Post('photo')
   async uploadPhoto(
-    @UserDecorator() user,
+    @UserDecorator() user: UserEntity,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -82,7 +83,7 @@ export class AuthController {
       throw new BadRequestException(e);
     }
 
-    return { success: true };
+    return photo;
   }
 
   @UseInterceptors(

@@ -62,7 +62,7 @@ describe('AuthService', () => {
 
     it('should send an email to user', async () => {
       const result = await authService.forget('jhon.doe@icloud.com');
-      expect(result).toEqual(true);
+      expect(result).toEqual({ success: true });
     });
 
     it('should reset password', async () => {
