@@ -32,7 +32,7 @@ export class UserController {
   }
 
   @Throttle(100, 60)
-  @Roles(Role.Admin, Role.User)
+  @Roles(Role.Admin)
   @Get()
   async read() {
     return await this.userService.read();
