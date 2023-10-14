@@ -16,14 +16,16 @@ import { AuthRegisterDTO } from './dto/auth-register.dto';
 import { AuthForgetDTO } from './dto/auth-forget.dto';
 import { AuthResetDTO } from './dto/auth-reset.dto';
 import { AuthService } from './auth.service';
-import { AuthGuard } from 'src/guards/auth.guard';
-import { UserDecorator } from 'src/decorators/user.decorator';
+
 import {
   FileInterceptor,
   FileFieldsInterceptor,
 } from '@nestjs/platform-express';
-import { join } from 'path';
-import { FileService } from 'src/file/file.service';
+
+import { AuthGuard } from '../guards/auth.guard';
+import { UserDecorator } from '../decorators/user.decorator';
+import { FileService } from '../file/file.service';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -54,15 +56,15 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @Post('me')
-  async me(@UserDecorator() user) {
-    return { user };
+  async me(@UserDecorator() user: UserEntity) {
+    return user;
   }
 
   @UseInterceptors(FileInterceptor('file'))
   @UseGuards(AuthGuard)
   @Post('photo')
   async uploadPhoto(
-    @UserDecorator() user,
+    @UserDecorator() user: UserEntity,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -74,21 +76,14 @@ export class AuthController {
     photo: Express.Multer.File,
   ) {
     try {
-      const path = join(
-        __dirname,
-        '..',
-        '..',
-        'storage',
-        'photos',
-        `photo-${user.id}.png`,
-      );
+      const fileName = `photo-${user.id}.png`;
 
-      await this.fileService.upload(photo, path);
+      await this.fileService.upload(photo, fileName);
     } catch (e) {
       throw new BadRequestException(e);
     }
 
-    return { success: true };
+    return photo;
   }
 
   @UseInterceptors(
@@ -106,13 +101,14 @@ export class AuthController {
   @UseGuards(AuthGuard)
   @Post('files-fields')
   async uploadFilesFields(
-    @UserDecorator() user,
     @UploadedFiles()
-    files: { photo: Express.Multer.File; documents: Express.Multer.File },
+    files: {
+      photo: Express.Multer.File;
+      documents: Express.Multer.File;
+    },
   ) {
     try {
-      const path = join(__dirname, '..', '..', 'storage', 'files');
-      await this.fileService.uploadFiles(files, path);
+      await this.fileService.uploadFiles(files);
       return { success: true };
     } catch (e) {
       throw new BadRequestException(e);

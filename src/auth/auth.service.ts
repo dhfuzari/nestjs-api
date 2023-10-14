@@ -5,12 +5,14 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { AuthRegisterDTO } from './dto/auth-register.dto';
-import { UserService } from 'src/user/user.service';
+
 import * as bcrypt from 'bcrypt';
 import { MailerService } from '@nestjs-modules/mailer';
-import { UserEntity } from 'src/user/entity/user.entity';
+
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UserService } from '../user/user.service';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -31,7 +33,7 @@ export class AuthService {
   private audienceForgetPassword = 'users';
   private expiresInForgetPassword = '30 minutes';
 
-  async createTken(user: UserEntity) {
+  async createToken(user: UserEntity) {
     return {
       accessToken: this.jwtService.sign(
         {
@@ -74,14 +76,15 @@ export class AuthService {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
-      throw new UnauthorizedException('Email e/ou senha incorreto 123');
+      throw new UnauthorizedException('Email e/ou senha incorreto');
     }
 
     if (!(await bcrypt.compare(password, user.password))) {
-      throw new UnauthorizedException('Email e/ou senha incorreto 3444');
+      throw new UnauthorizedException('Email e/ou senha incorreto');
     }
+    const token = this.createToken(user);
 
-    return this.createTken(user);
+    return token;
   }
 
   async forget(email: string) {
@@ -113,7 +116,7 @@ export class AuthService {
       },
     });
 
-    return true;
+    return { success: true };
   }
 
   async reset(password: string, token: string) {
@@ -136,7 +139,7 @@ export class AuthService {
 
       const user = await this.userService.readById(Number(data.id));
 
-      return this.createTken(user);
+      return this.createToken(user);
     } catch (error) {
       throw new BadRequestException(error);
     }
@@ -145,8 +148,10 @@ export class AuthService {
   }
 
   async register(data: AuthRegisterDTO) {
+    if (data.role) delete data.role;
+
     const user = await this.userService.create(data);
 
-    return this.createTken(user);
+    return this.createToken(user);
   }
 }
